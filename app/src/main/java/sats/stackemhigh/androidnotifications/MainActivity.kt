@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        const val NOTIFICATION_ID = 3871
+        const val NOTIFICATION_ID1 = 3871
         const val NOTIFICATION_KEY = "PLAKJSD09F2I9FUHB1Q"
     }
 
@@ -23,11 +23,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         btn_get_notification.setOnClickListener {
             // Create an intent for the notification to open the app to the FullscreenActivity
-            val contentIntent = Intent(this, FullscreenActivity::class.java)
-            contentIntent.putExtra(NOTIFICATION_KEY, "Notification Tapped")
+            val contentIntent = Intent(this, FullscreenActivity::class.java).apply {
+                putExtra(NOTIFICATION_KEY, "Notification Tapped")
+            }
             val pendingContentIntent = PendingIntent.getActivity(this, 0, contentIntent, PendingIntent.FLAG_ONE_SHOT)
+
+            // Intent for the action button on the notification
+            val actionIntent = Intent(this, FullscreenActivity::class.java).apply {
+                putExtra(NOTIFICATION_KEY, "Action Button")
+            }
+            val actionContentIntent = PendingIntent.getActivity(this, 0, actionIntent, 0)
 
             // Channel ID (needed outside of `if` statements checking for version)
             val channelId = "$packageName.simplechan"
@@ -37,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             // Check for build version greater than or equal to version Oreo to set channels
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val name = "Channel Notification"
-                val importance = NotificationManager.IMPORTANCE_LOW
+                val importance = NotificationManager.IMPORTANCE_HIGH
                 val description = "Description Description Description"
 
                 val channel = NotificationChannel(channelId, name, importance)
@@ -48,14 +56,16 @@ class MainActivity : AppCompatActivity() {
 
             // Will always happen independent of build version
             val notificationBuilder = NotificationCompat.Builder(this, channelId)
-                .setPriority(NotificationManager.IMPORTANCE_LOW)
+                .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 .setContentTitle("Notification Notification")
                 .setContentText("Content Content Content")
                 .setSmallIcon(android.R.drawable.ic_dialog_alert)
                 .setColor(Color.GREEN)
                 .setDefaults(1)
                 .setContentIntent(pendingContentIntent)
-            notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+                .addAction(android.R.drawable.sym_def_app_icon, "Action", actionContentIntent)
+                .setAutoCancel(true)
+            notificationManager.notify(NOTIFICATION_ID1, notificationBuilder.build())
         }
 
 
